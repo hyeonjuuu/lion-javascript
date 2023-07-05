@@ -1,4 +1,4 @@
-console.log('hello js!');
 
-const a = 10;
-const b = 11;
+
+// const a = 10;
+// const b = 11;
