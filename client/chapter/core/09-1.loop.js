@@ -70,11 +70,11 @@ while (i < frontEndDev.length) {
 // }
 
 // ^ ver4 -> spread syntax -> new
-let copyArray = [...frontEndDev];
+// let copyArray = [...frontEndDev];
 
-while (frontEndDev.length) {
-  // console.log(frontEndDev.pop());  //pop 사용
-  console.log(frontEndDev.shift()); //shirft 사용
-}
+// while (frontEndDev.length) {
+//   // console.log(frontEndDev.pop());  //pop 사용
+//   console.log(frontEndDev.shift()); //shirft 사용
+// }
 
 // 성능 진단 : 순환 vs. 역순환
