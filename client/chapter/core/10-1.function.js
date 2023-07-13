@@ -42,16 +42,16 @@ const result = calcPrice(10000, 3500);
 
 console.log(result); */
 
-function getRandomValue(){
-  return Math.random() > 0.5 ? 1 : 0;
-}
+// function getRandomValue(){
+//   return Math.random() > 0.5 ? 1 : 0;
+// }
 
-function calcPrice(
-  priceA.
-  priceB,
-  priceC = 0,
-  priceD = 0
-)
+// function calcPrice(
+//   priceA.
+//   priceB,
+//   priceC = 0,
+//   priceD = 0
+// )
 
 // 매개 변수 vs. 전달 인자
 
@@ -85,3 +85,11 @@ let css;
 // 2. h1의 폰트 사이즈를 가져온다.
 // 3. 증가함수와 감소함수를 만든다.
 // 4. 클릭 이벤트와 바인딩한다.
+
+let condition = Boolean('1');
+
+if (condition) {
+  const i = 0;
+}
+
+console.log(i);
