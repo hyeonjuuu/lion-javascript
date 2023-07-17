@@ -11,28 +11,28 @@
 
 // #배열 선언
 // 원시 래퍼 객체로 인해 가능함
-let friend = '진승, 혜미, 송이, 효윤, 선용, 승민, 상호, 영은, 희소'.split(',');
+let friends = '진승, 혜미, 송이, 효윤, 선용, 승민, 상호, 영은, 희소'.split(',');
 // console.log(freind);
 
 // #배열 요소의 총 갯수
 // console.log((friend.length = 3));
 
 // 배열 요소 변경
-friend[0] = '선범';
+friends[0] = '선범';
 
 // #배열 요소 추가
 // 배열의 앞에 요소 추가
-let unshift = friend.unshift('진승');
-console.log(friend);
+let unshift = friends.unshift('진승');
+console.log(friends);
 
 // 배열의 뒤에 요소 추가
-let push = friend.push('동균');
+let push = friends.push('동균');
 
 // #배열 요소 제거
 // 앞 요소 제거
-let shift = friend.shift();
+let shift = friends.shift();
 // 뒤 요소 제거
-let pop = friend.pop();
+let pop = friends.pop();
 
 // 큐(queue) vs. 스택(stack)
 // 큐 FIFO (먼저 들어온 것이 먼저 나간다) ← queue ←
@@ -41,8 +41,19 @@ let pop = friend.pop();
 // 배열 요소 순환(loop)
 // for 문, for ~ of문
 
+for (let i = 0; i < friends.length; i++) {
+  console.log(friends[i]);
+}
+
+for (let value of friends) {
+  console.log(value);
+}
+
 // 배열 복사
-let copiedArray;
+// let copiedArray = [...friends];
+// let copiedArray = friends.slice();
+let copiedArray = friends.toSorted();
+console.log(copiedArray);
 
 // 다차원 배열
 // 행렬을 저장하는 용도
