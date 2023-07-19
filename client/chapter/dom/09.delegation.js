@@ -47,3 +47,5 @@ function handleDelegation(e) {
 }
 
 container.addEventListener('click', handleDelegation);
+
+/* ------------------------------------------------------------ */
