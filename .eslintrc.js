@@ -22,6 +22,7 @@ module.exports = {
   },
   rules: {
     'no-unused-vars': 'warn',
-    // 'no-undef': 'off',
+    // no-undef 주석처리하기
+    'no-undef': 'off',
   },
 };
