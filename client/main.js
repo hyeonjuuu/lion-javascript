@@ -5,6 +5,7 @@ import {
   attr,
   insertLast,
   endScroll,
+  clearContents,
 } from './lib/index.js';
 
 // #[pharse-1] 주사위굴리기
@@ -24,6 +25,12 @@ import {
 // - hidden 속성 false 만들기
 // - 초기화 버튼 이벤트 바인딩
 // - hidden 속성 true 만들기
+// 3. 주사위 값을 가져와서 렌더링
+// 4. 스크롤 위치 내리기
+// 5. 함수 분리
+
+// [pharse-3] 초기화 시키기
+// 1. 아이템 지우기
 
 /* ------------------------------------------------------------------------ */
 // const button = getNodes('.buttonGroup > button');
@@ -206,6 +213,12 @@ function handleReset() {
   // 초기화 버튼을 누르면 다시 기록, 초기화 버튼 비활성화 되도록.
   recordButton.disabled = true;
   resetButton.disabled = true;
+  // 초기화 1. 아이템 지우기
+  clearContents(tbody);
+
+  // 회차, 합계의 기록도 초기화 시키기.
+  count = 0;
+  total = 0;
 }
 
 startButton.addEventListener('click', handleRollingDice);
