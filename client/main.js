@@ -1,4 +1,6 @@
-console.log('hello js!');
+import {} from './lib/index.js';
 
-const a = 10;
-const b = 11;
+// xhr.get('https://jsonplaceholder.typicode.com/users'),
+//   (res) => {
+//     console.log(res);
+//   };

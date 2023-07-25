@@ -1,0 +1,573 @@
+/* js */
+
+/* 
+
+[readystate] : 현재의 상태가 변경되었는지 확인
+
+0: uninitalized
+1: loading
+2: loaded
+3: interactive
+4: complete
+
+*/
+
+/* ----------------------------------------------------------- */
+// 브라우저가 가지고 있는 엔진을 객체로 생성하여 xhr에 할당
+const xhr = new XMLHttpRequest();
+
+console.log(xhr.readyState); // 0
+
+// open메서드를 사용해서 어떤 통신을 하는지, url로부터(어떤 서버의 URL)
+// method : 'string', URL: 'string'
+xhr.open('GET', 'https://jsonplaceholder.typicode.com/users');
+
+console.log(xhr.readyState); // 1
+
+xhr.send();
+
+/* ----------------------------------------------------------- */
+
+// 생성자 함수로 담아서 사용
+const xhr = new XMLHttpRequest();
+
+// ^ 순서 : open-send-event
+// 오픈메서드 겟통신
+xhr.open('GET', 'https://jsonplaceholder.typicode.com/users');
+
+// 상태가 변경되는 결과를 출력
+xhr.addEventListener('readystatechange', () => {
+  if (xhr.status >= 200 && xhr.status < 400) {
+    console.log('통과');
+  } else {
+    console.log('실패');
+  }
+  // console.log(xhr.status);
+  // console.log(xhr.readyState);
+});
+
+// send로 통신
+xhr.send();
+
+/* --------------------------------------------------------------- */
+const xhr = new XMLHttpRequest();
+
+// ^open-send-event
+xhr.open('GET', 'https://jsonplaceholder.typicode.com/users');
+
+// status의 상태에 따라서 대상을 가져온다.
+xhr.addEventListener('readystatechange', () => {
+  if (xhr.status >= 200 && xhr.status < 400) {
+    if (xhr.readyState === 4) {
+      console.log(xhr.response);
+    }
+  } else {
+    console.log('실패');
+  }
+  // console.log(xhr.status);
+  // console.log(xhr.readyState);
+});
+
+xhr.send();
+
+/* --------------------------------------------------------------- */
+// #구조분해할당.
+const { status, readyState, response } = xhr;
+/* ----------------------------------------------------------- */
+// #함수로 만들기
+// ^2. 인수가 올라와 함수 안에서 변수로 사용.
+function xhr(method, url) {
+  const xhr = new XMLHttpRequest();
+
+  // ^3. 2번의 값이 그대로 들어옴.
+  xhr.open(method, url);
+
+  xhr.addEventListener('readystatechange', () => {
+    const { status, readyState, response } = xhr;
+    if (status >= 200 && status < 400) {
+      if (readyState === 4) {
+        console.log(JSON.parse(response));
+      }
+    } else {
+      console.log('실패');
+    }
+    // console.log(xhr.status);
+    // console.log(xhr.readyState);
+  });
+
+  xhr.send();
+}
+
+// 실행부
+// ^1. 인수 2개를 던짐.
+xhr('GET', 'https://jsonplaceholder.typicode.com/users');
+
+/* ----------------------------------------------------------- */
+// *callback
+// callback: JSON.parse(response)값을 가져와서 밖에서 사용하려고
+
+// # onSuccess
+// ^2. xhr의 3번짜 파라미터로 넘어감.
+// success를 통해 함수 내부에서 함수를 사용할 수 있음
+function xhr(method, url, onSuccess) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.open(method, url);
+
+  xhr.addEventListener('readystatechange', () => {
+    const { status, readyState, response } = xhr;
+    if (status >= 200 && status < 400) {
+      if (readyState === 4) {
+        // ^3. 완벽하게 통신이 이루어진 상태에서 문자가 아닌 실제 데이터로 onSuccess에 전달됨. -> arguments
+        console.log(JSON.parse(response));
+      }
+    } else {
+      console.log('실패');
+    }
+    // console.log(xhr.status);
+    // console.log(xhr.readyState);
+  });
+
+  xhr.send();
+}
+
+// 실행부
+// ^1. 3번째 인수로 함수 전달
+xhr(
+  'GET',
+  'https://jsonplaceholder.typicode.com/users',
+  // ^4. parameter
+  () => {}
+);
+/* --------------------------------------------------------- */
+// # onFail
+
+// *callback
+// callback: JSON.parse(response)값을 가져와서 밖에서 사용하려고
+
+// ^2. xhr의 3번짜 파라미터로 넘어감.
+// success를 통해 함수 내부에서 함수를 사용할 수 있음
+function xhr(method, url, onSuccess, onFail) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.open(method, url);
+
+  xhr.addEventListener('readystatechange', () => {
+    const { status, readyState, response } = xhr;
+    if (status >= 200 && status < 400) {
+      if (readyState === 4) {
+        // ^3. 완벽하게 통신이 이루어진 상태에서 문자가 아닌 실제 데이터로 onSuccess에 전달됨. -> arguments
+        onSuccess(JSON.parse(response));
+      }
+    } else {
+      onFail('실패');
+    }
+  });
+
+  xhr.send();
+}
+
+// 실행부
+// ^1. 3번째 인수로 함수 전달
+xhr(
+  'GET',
+  'https://jsonplaceholder.typicode.com/users',
+  // ^4. parameter
+  (result) => {
+    console.log(result);
+  },
+  // 에러 처리
+  (err) => {
+    console.log(err);
+  }
+);
+/* ---------------------------------------------------------- */
+
+// #Body
+// 2. 함수에서 전달되는 body를 받기 위해 body파라미터
+function xhr(method, url, onSuccess, onFail, body) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.open(method, url);
+
+  // 문자가 아니라 json의 형태로 읽어야 한다고 노티.
+  // key,와 value 설정
+  xhr.setRequestHeader('Content-Type', 'application/json');
+
+  xhr.addEventListener('readystatechange', () => {
+    const { status, readyState, response } = xhr;
+    if (status >= 200 && status < 400) {
+      if (readyState === 4) {
+        onSuccess(JSON.parse(response));
+      }
+    } else {
+      onFail('실패');
+    }
+  });
+  // 3. 문자화하여 다시 send
+  // 전달받은 객체를 문자화 시키고 서버에 전달
+  xhr.send(JSON.stringify(body));
+}
+
+// xhr을 사용하여 pust put 통신
+// 1. body를 전달해야 함.
+xhr(
+  'POST',
+  'https://jsonplaceholder.typicode.com/users',
+  (result) => {
+    console.log(result);
+  },
+  (err) => {
+    console.log(err);
+  },
+  {
+    name: 'tiger',
+  }
+);
+/* ------------------------------------------------------------- */
+
+// #HEADERS
+// *callback
+// callback: JSON.parse(response)값을 가져와서 밖에서 사용하려고
+
+// ^2. 객체 자체가 headers로 오게 됨
+function xhr(method, url, onSuccess, onFail, body, headers) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.open(method, url);
+
+  // entries: 하나의 배열에 키, 밸류가 쌍으로 들어감.
+  // ^3. entries의 배열을 받아서 setRequestHeader(key, value)로 구조분해 할당이 되고 forEach이기 때문에 배열을 한번 더 돌아서 두번째 객체도 구조분해 할당 됨.
+  Object.entries(headers).forEach(([key, value]) => {
+    xhr.setRequestHeader(key, value);
+  });
+
+  xhr.addEventListener('readystatechange', () => {
+    const { status, readyState, response } = xhr;
+    if (status >= 200 && status < 400) {
+      if (readyState === 4) {
+        onSuccess(JSON.parse(response));
+      }
+    } else {
+      onFail('실패');
+    }
+  });
+  xhr.send(JSON.stringify(body));
+}
+
+xhr(
+  'POST',
+  'https://jsonplaceholder.typicode.com/users',
+  (result) => {
+    console.log(result);
+  },
+  (err) => {
+    console.log(err);
+  },
+  {
+    name: 'tiger',
+  },
+  // ^1. headers 전달
+  // 객체의 key, value
+  {
+    'Content-Type': 'application/json',
+    // 동일출처 정책 에러 해결을 위해 때문에 필요함.
+    'Access-Control-Allow-Origin': '*',
+  }
+);
+
+/* -------------------------------------------------------------- */
+// #Problem : 메서드가 너무 많다!(자리(순서)를 맞춰서 작성해야 함.)
+
+function xhr(options) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.open(method, url);
+
+  Object.entries(headers).forEach(([key, value]) => {
+    xhr.setRequestHeader(key, value);
+  });
+
+  xhr.addEventListener('readystatechange', () => {
+    const { status, readyState, response } = xhr;
+    if (status >= 200 && status < 400) {
+      if (readyState === 4) {
+        onSuccess(JSON.parse(response));
+      }
+    } else {
+      onFail('실패');
+    }
+  });
+  xhr.send(JSON.stringify(body));
+}
+
+// 객체로 작성하여 순서 상관 없이 작성
+// method, url, onSuccess, onFail, body, headers
+xhr({
+  method: 'GET',
+  url: 'https://jsonplaceholder.typicode.com/users',
+  onSuccess: () => {},
+  onFail: () => {},
+  body: {
+    name: 'tiger',
+  },
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
+});
+
+// #-----------------------------------------Problem 구조분해 할당
+// 1. options라는 하나의 파라미터를 받음
+function xhr(options) {
+  console.log(options); // 객체가 출력됨.
+
+  // method, url, onSuccess, onFail, body, headers
+  //^아래 인자에서 다 지정을 해줘야 함.
+  // const {method, url, onSuccess, onFail, body, headers} = options
+
+  // ^그래서 구조분해 할당을 하여 기본값을 준다.
+  // *구조분해 할당
+  // 구조분해 할당으로 객체에서 필요한 항목들만 선택하여 사용할 수 있다.
+  // 구조분해 할당 장점 : rename, 기본값 설정,
+  const {
+    method = 'GET',
+    url = '',
+    onSuccess = null,
+    onFail = null,
+    body = null,
+    headers = {
+      'Content-Type': 'application.json',
+      'Access-Control-Allow-Origin': '*',
+    },
+  } = options;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open(method, url);
+
+  Object.entries(headers).forEach(([key, value]) => {
+    xhr.setRequestHeader(key, value);
+  });
+
+  xhr.addEventListener('readystatechange', () => {
+    const { status, readyState, response } = xhr;
+    if (readyState === 4) {
+      if (status >= 200 && status < 400) {
+        onSuccess(JSON.parse(response));
+      } else {
+        onFail('실패');
+      }
+    }
+  });
+
+  xhr.send(JSON.stringify(body));
+}
+
+// 객체로 작성하여 순서 상관 없이 작성
+// method, url, onSuccess, onFail, body, headers
+xhr({
+  url: 'https://jsonplaceholder.typicode.com/users',
+  onSuccess: () => {}, //실제 실행시는 값이 있어야 함.
+  onFail: () => {}, //실제 실행시는 값이 있어야 함.
+  body: {
+    name: 'tiger',
+  },
+});
+
+/* ------------------------------------------------------- */
+
+// ^xhr은 함수이지만 객체.
+xhr.get = (url, onSuccess, onFail) => {
+  xhr({
+    url: url,
+    onSuccess: onSuccess,
+    onFail: onFail,
+  });
+};
+/* /-------------------------------------------------------*/
+//
+// 1. 자바스크립트의 함수는 본래는 객체다.
+// 2. 사용자(협업 개발자)입장 : 쉽게쓰자 // 매번 메서드를 정의하는게 아니라 xhr.get, xhr.post로 사용하자
+// 3. 설계자가 함수 안에 메서드를 넣어버리자.
+// 메서드는 객체 안에 들어있는 함수.
+// xhr이라는 객체 안에 get이라는 메서드를 심어버리기.
+
+// ^xhr은 함수이지만 객체.
+// shorthand porperty
+// 메서드이기때문에 파라미터를 받는다.
+xhr.get = (url, onSuccess, onFail) => {
+  // xhr함수를 실행할때 전달해주자!
+  xhr({
+    // 사용자가 입력받은 url을 전달하자 url: url / 생략
+    url,
+    // 사용자가 입력받은 onSuccess을 전달하자 onSuccess: onSuccess / 생략
+    onSuccess,
+    // 사용자가 입력받은 onFail을 전달하자 onFail: onFail / 생략
+    onFail,
+  });
+};
+
+xhr.post = (url, body, onSuccess, onFail) => {
+  xhr({
+    method: 'POST',
+    url,
+    body,
+    onSuccess,
+    onFail,
+  });
+};
+
+// 실행부
+xhr.get(
+  'https://jsonplaceholder.typicode.com/users',
+  () => {},
+  () => {}
+);
+
+// xhr.get()
+// xhr.post()
+// xhr.put()
+// xhr.delete()
+/* -------------------------------------------------------- */
+/**
+ *
+ * @param {string} url  서버와 통신할 주소
+ * @param {function} onSuccess  서버와 통신 성공시 실행될 콜백 함수
+ * @param {function} onFail 서버와의 통신 실패시 실행될 콜백 함수
+ * @return server data
+ */
+
+// xhr.get()
+xhr.get = (url, onSuccess, onFail) => {
+  // xhr함수를 실행할때 전달해주자!
+  xhr({
+    url,
+    onSuccess,
+    onFail,
+  });
+};
+
+// xhr.post()
+xhr.post = (url, body, onSuccess, onFail) => {
+  xhr({
+    method: 'POST',
+    url,
+    body,
+    onSuccess,
+    onFail,
+  });
+};
+
+// xhr.put()
+// 어떤 항목을 어떻게 변경할건지 설정 필요
+xhr.put = (url, body, onSuccess, onFail) => {
+  // 함수를 실행하는데 객체가 들어오게 됨.
+  xhr({
+    method: 'PUT',
+    url,
+    body,
+    onSuccess,
+    onFail,
+  });
+};
+
+// xhr.delete()
+xhr.delete = (url, onSuccess, onFail) => {
+  xhr({
+    method: 'DELETE',
+    url,
+    onSuccess,
+    onFail,
+  });
+};
+
+/* ---------------------------------------------------------------- */
+export function xhr({
+  method = 'GET',
+  url = '',
+  onSuccess = null,
+  onFail = null,
+  body = null,
+  headers = {
+    'Content-Type': 'application.json',
+    'Access-Control-Allow-Origin': '*',
+  },
+} = {}) {
+  const xhr = new XMLHttpRequest();
+  xhr.open(method, url);
+
+  Object.entries(headers).forEach(([key, value]) => {
+    xhr.setRequestHeader(key, value);
+  });
+
+  xhr.addEventListener('readystatechange', () => {
+    const { status, readyState, response } = xhr;
+    if (readyState === 4) {
+      if (status >= 200 && status < 400) {
+        onSuccess(JSON.parse(response));
+      } else {
+        onFail('실패');
+      }
+    }
+  });
+
+  xhr.send(JSON.stringify(body));
+}
+
+// xhr({
+//   url:'https://jsonplaceholder.typicode.com/users',
+//   onSuccess:()=>{},
+//   onFail:()=>{},
+//   body:{
+//     name:'tiger'
+//   }
+// });
+
+// 1. 자바스크립트의 함수는 본래는 객체다.
+// 2. 사용자(협업 개발자)입장 : 쉽게쓰자 // 매번 메서드를 정의하는게 아니라 xhr.get, xhr.post로 사용하자
+// 3. 설계자가 함수 안에 메서드를 넣어버리자.
+
+/**
+ *
+ * @param {string} url  서버와 통신할 주소
+ * @param {function} onSuccess  서버와 통신 성공시 실행될 콜백 함수
+ * @param {function} onFail 서버와의 통신 실패시 실행될 콜백 함수
+ * @return server data
+ */
+
+xhr.get = (url, onSuccess, onFail) => {
+  xhr({
+    url,
+    onSuccess,
+    onFail,
+  });
+};
+
+xhr.post = (url, body, onSuccess, onFail) => {
+  xhr({
+    method: 'POST',
+    url,
+    body,
+    onSuccess,
+    onFail,
+  });
+};
+
+xhr.put = (url, body, onSuccess, onFail) => {
+  xhr({
+    method: 'PUT',
+    url,
+    body,
+    onSuccess,
+    onFail,
+  });
+};
+
+xhr.delete = (url, onSuccess, onFail) => {
+  xhr({
+    method: 'DELETE',
+    url,
+    onSuccess,
+    onFail,
+  });
+};

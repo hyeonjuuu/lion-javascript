@@ -1,0 +1,12 @@
+// 2.함수 본문을 받아 실행시킴
+function delay(callback, timeout = 1000) {
+  // 몇초 후에 실행될지 타이머 지정
+  setTimeout(callback, timeout);
+}
+
+console.log(1);
+// 1. 함수 본문을 던짐
+delay(() => {
+  console.log(2);
+});
+console.log(3);
