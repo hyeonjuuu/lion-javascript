@@ -1,6 +1,5 @@
-import {} from './lib/index.js';
+import { tiger } from './lib/index.js';
 
-// xhr.get('https://jsonplaceholder.typicode.com/users'),
-//   (res) => {
-//     console.log(res);
-//   };
+const data = tiger.get('https://jsonplaceholder.typicode.com/users');
+
+console.log(data);

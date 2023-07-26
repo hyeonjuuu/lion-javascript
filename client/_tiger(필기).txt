@@ -1,0 +1,447 @@
+fetch 기본은 get통신
+내뱉는 값을 data에 담는다
+const data = fetch('https://pokeapi.co/api/v2/pokemon/30');
+
+console.log(data); // promise 객체를 반환
+-----------------------------------------------------------
+const response = await fetch('https://pokeapi.co/api/v2/pokemon/30');
+
+console.log(response);
+
+const data = await response.json();
+
+console.log(data);
+---------------------------------------------------------------
+
+const tiger = (url) => {
+  const response = fetch(url);
+  if (response.ok) {
+    console.log(response); // promise 객체
+  }
+};
+
+tiger('https://pokeapi.co/api/v2/pokemon/30');
+------------------------------------------------------------------------
+// const tiger = async (url) => {
+//   const response = await fetch(url);
+//   console.log(response);
+
+//   if (response.ok) {
+//     const data = response.json();
+//   }
+// };
+
+// tiger('https://pokeapi.co/api/v2/pokemon/30');
+
+-----------------------------------------------------------------------------
+
+const tiger = async (url) => {
+  const response = await fetch(url);
+  let data;
+
+  if (response.ok) {
+    data = response.json();
+  }
+
+  return data;
+};
+
+-------------------------------------------------------------------------------
+
+
+const tiger = async (url) => {
+  const response = await fetch(url);
+
+  console.log(response); // promise 객체, 나의 상태에 대한 정보이지 결과값은 아님.
+
+  if (response.ok) {
+    response.data = response.json(); // response.json(): 실질적인 결과
+    console.log(response);
+  }
+
+  return response;
+};
+
+console.log(await tiger('https://jsonplaceholder.typicode.com/users'));
+---------------------------------------------------------------------------
+범쌤코드
+
+const tiger = async (url) => {
+  const response = await fetch(url);
+
+  console.log(response); // promise 객체, 나의 상태에 대한 정보이지 결과값은 아님.
+
+  if (response.ok) {
+    response.data = response.json(); // response.json(): 실질적인 결과
+    console.log(response);
+  }
+
+  return response;
+};
+
+console.log(await tiger('https://jsonplaceholder.typicode.com/users'));
+
+-----------------------------------------------------------------------------
+await 기능 1. 코드 실행흐름 제어 2. 
+
+const URL = 'https://jsonplaceholder.typicode.com/users';
+
+const tiger = async (url) => {
+  // fetch는 url을 던지면 자동으로 get통신이 일어남.
+  const response = await fetch(url); // 프라미스 객체가 출력됨.
+
+  console.log(response); // promise 객체, 나의 상태에 대한 정보이지 결과값은 아님.
+  // response가 일어나면 위에서 받은 프라미스 객체의 ok 여부를 따지고
+  if (response.ok) {
+    // response.json의 값을 response.data에 할당된다.
+    response.data = response.json(); // response.json(): 실질적인 결과
+    console.log(response);
+  }
+
+  return response;
+};
+
+console.log(await tiger('https://jsonplaceholder.typicode.com/users'));
+-----------------------------------------------------------------------
+then
+
+-----------------------------------------------------------------------
+const tiger = async (url,options) => {
+
+  const response = await fetch(url,options);
+
+  if(response.ok){
+     response.data = await response.json();
+  }
+
+  return response;
+}
+
+
+const response = await tiger(URL,{
+  method:'POST',
+  body:JSON.stringify({name:'tiger'}),
+  headers:{
+    'Content-Type':'application/json',
+    'Access-Control-Allow-Origin':'*'
+  }
+});
+
+const userData = response.data;
+
+console.log( userData );
+-----------------------------------------------------------------------
+const URL = 'https://jsonplaceholder.typicode.com/users';
+
+const defaultOptions = {
+  method: 'GET',
+  body: null,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
+};
+
+const tiger = async (url, options) => {
+  const response = await fetch(url, options);
+
+  if (response.ok) {
+    response.data = await response.json();
+  }
+
+  return response;
+};
+const response = await tiger(URL, {
+  method: 'POST',
+  body: JSON.stringify({ name: 'tiger' }),
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
+});
+const userData = response.data;
+console.log(userData);
+-------------------------------------------------------------
+
+const tiger = async (options) => {
+  // 덮어씌워서 새로운 객체를 만듦.
+
+  // url을 뺀 나머지 객체들을 restOptions로 받음.
+  // restOptions = url이 빠진 나머지 객체
+  const { url, ...restOptions } = {
+    ...defaultOptions, //원래 가지고 있던 기본 값
+    ...options, //호출을 통해 전달된 값
+    headers: {
+      // ---여기까지는 얕은 복사만 됨.
+      ...defaultOptions.headers,
+      ...options.headers,
+    },
+    // defaultOptions.headers 값과 options.headers을 덮어씌워 새로운 headers 객체를 만든다.
+  };
+
+  const response = await fetch(url, restOptions);
+
+  if (response.ok) {
+    response.data = await response.json();
+  }
+
+  return response;
+};
+
+const response = await tiger({
+  url: URL,
+});
+
+const userData = response.data;
+
+console.log(userData);
+
+--------------------------------------------------------------------
+// const tiger = async (url) => {
+//   const response = await fetch(url);
+//   console.log(response);
+
+//   if (response.ok) {
+//     const data = response.json();
+//   }
+// };
+
+// tiger('https://pokeapi.co/api/v2/pokemon/30');
+//--------------------------------------------------------------
+
+/* const URL = 'https://jsonplaceholder.typicode.com/users';
+
+const defaultOptions = {
+  method: 'GET',
+  body: null,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
+};
+
+const tiger = async (url, options) => {
+  
+  const response = await fetch(url, options);
+
+  if (response.ok) {
+    response.data = await response.json();
+  }
+
+  return response;
+};
+const response = await tiger({
+  URL,
+  method: 'POST',
+});
+const userData = response.data;
+console.log(userData); */
+
+//----------------------------------------------------------------------
+// console.log(await tiger('https://jsonplaceholder.typicode.com/users'));
+
+// const response = await fetch('https://pokeapi.co/api/v2/pokemon/30');
+
+// console.log(response);
+
+// if (response.ok) {
+//   const data = await response.json();
+//   console.log(data);
+// }
+
+/* ------------------------------------------------------------------- */
+const URL = 'https://jsonplaceholder.typicode.com/users';
+
+const defaultOptions = {
+  method: 'GET',
+  body: null,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
+};
+
+/* const tiger = async (options) => {
+  // 덮어씌워서 새로운 객체를 만듦.
+
+  // url을 뺀 나머지 객체들을 restOptions로 받음.
+  // restOptions = url이 빠진 나머지 객체
+  const { url, ...restOptions } = {
+    ...defaultOptions, //원래 가지고 있던 기본 값
+    ...options, //호출을 통해 전달된 값
+    headers: {
+      // ---여기까지는 얕은 복사만 됨.
+      ...defaultOptions.headers,
+      ...options.headers,
+    },
+    // defaultOptions.headers 값과 options.headers을 덮어씌워 새로운 headers 객체를 만든다.
+  };
+
+  const response = await fetch(url, restOptions);
+
+  if (response.ok) {
+    response.data = await response.json();
+  }
+
+  return response;
+}; */
+
+// const response = await tiger({
+//   url: URL,
+// });
+
+// const userData = response.data;
+
+// console.log(userData);
+---------------------------------------------------------------
+// const tiger = async (url) => {
+//   const response = await fetch(url);
+//   console.log(response);
+
+//   if (response.ok) {
+//     const data = response.json();
+//   }
+// };
+
+// tiger('https://pokeapi.co/api/v2/pokemon/30');
+//--------------------------------------------------------------
+
+/* const URL = 'https://jsonplaceholder.typicode.com/users';
+
+const defaultOptions = {
+  method: 'GET',
+  body: null,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
+};
+
+const tiger = async (url, options) => {
+  
+  const response = await fetch(url, options);
+
+  if (response.ok) {
+    response.data = await response.json();
+  }
+
+  return response;
+};
+const response = await tiger({
+  URL,
+  method: 'POST',
+});
+const userData = response.data;
+console.log(userData); */
+
+//----------------------------------------------------------------------
+// console.log(await tiger('https://jsonplaceholder.typicode.com/users'));
+
+// const response = await fetch('https://pokeapi.co/api/v2/pokemon/30');
+
+// console.log(response);
+
+// if (response.ok) {
+//   const data = await response.json();
+//   console.log(data);
+// }
+
+/* ------------------------------------------------------------------- */
+const URL = 'https://jsonplaceholder.typicode.com/users';
+
+const defaultOptions = {
+  method: 'GET',
+  body: null,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
+};
+
+/* const tiger = async (options) => {
+  // 덮어씌워서 새로운 객체를 만듦.
+
+  // url을 뺀 나머지 객체들을 restOptions로 받음.
+  // restOptions = url이 빠진 나머지 객체
+  const { url, ...restOptions } = {
+    ...defaultOptions, //원래 가지고 있던 기본 값
+    ...options, //호출을 통해 전달된 값
+    headers: {
+      // ---여기까지는 얕은 복사만 됨.
+      ...defaultOptions.headers,
+      ...options.headers,
+    },
+    // defaultOptions.headers 값에 options.headers을 덮어씌워 새로운 headers 객체를 만든다.
+  };
+
+  const response = await fetch(url, restOptions);
+
+  if (response.ok) {
+    response.data = await response.json();
+  }
+
+  return response;
+}; */
+
+// const response = await tiger({
+//   url: URL,
+// });
+
+// const userData = response.data;
+
+// console.log(userData);
+
+// #tiger GET
+tiger.get = (url, options) => {
+  return tiger({
+    url,
+    ...options,
+  });
+};
+
+// tiger.get();
+
+// #tiger POST
+tiger.post = (url, body, options) => {
+  return tiger({
+    method: 'POST',
+    url,
+    body: JSON.stringify(body),
+    ...options,
+  });
+};
+
+// #tiger DELETE
+tiger.delete = (url, options) => {
+  return tiger({
+    method: 'DELETE',
+    url,
+    ...options,
+  });
+};
+
+// #tiger PUT
+tiger.put = (url, body, options) => {
+  return tiger({
+    method: 'PUT',
+    url,
+    body: JSON.stringify(body),
+    ...options,
+  });
+};
+
+export const tiger = async (options) => {
+  const { url, ...restOptions } = {
+    ...defaultOptions,
+    ...options,
+    headers: {
+      ...defaultOptions.headers,
+      ...options.headers,
+    },
+  };
+  const response = await fetch(url, restOptions);
+  if (response.ok) {
+    response.data = await response.json();
+  }
+  return response;
+};
