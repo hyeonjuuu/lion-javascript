@@ -33,7 +33,7 @@ const defaultOptions = {
   errorMessage: '알 수 없는 오류가 발생했습니다.',
 };
 
-function delayP(options) {
+export function delayP(options) {
   // 전개 연산을 통해서 얕은 복사를 하여 값을 config에 담아 쓴다.
   let config = { ...defaultOptions };
   // *옵션의 값이 숫자일 때

@@ -1,0 +1,258 @@
+// 1. tiger 함수를 사용해서 user을 가져와주세요.
+// 2. 함수 안으로 넣기
+
+async function renderUserList() {
+  const response = await tiger.get(
+    'https://jsonplaceholder.typicode.com/users'
+  );
+
+  const userData = response.data;
+  // console.log(userData); // 배열
+
+  // userdata 배열의 아이템 뽑아내기
+  userData.forEach((item) => {
+    console.log(item);
+  });
+}
+
+renderUserList();
+------------------------------------------------------------------------------
+##html 템플릿 만들기
+  const template = `<article class="user-card" data-index="user-1">
+  <h3 class="user-name">kindtiger</h3>
+  <div class="user-resouce-info">
+    <div>
+      <a class="user-email" href="mailto:tiger@euid.dev"
+        >tiger@euid.dev</a
+      >
+    </div>
+    <div>
+      <a
+        class="user-website"
+        href="http://tiger.com"
+        target="_blank"
+        rel="noopener noreferer"
+        >tiger.com</a
+      >
+    </div>
+  </div>
+  <button class="delete">삭제</button>
+</article>`;
+
+  insertLast('.user-card-inner', template);
+  -------------------------------------------------------------------------------
+  import { insertLast } from './insert.js';
+
+// #생성
+
+// ()안에 객체를 전달해야 함.
+
+function createUserCard(data) {
+  const template = `
+  <article class="user-card" data-index="user-${item.id}">
+    <h3 class="user-name">${item.name}</h3>
+    <div class="user-resouce-info">
+      <div>
+        <a class="user-email" href="mailto:${item.email}">${item.email}</a>
+      </div>
+      <div>
+        <a class="user-website" href="http://${item.website}" target="_blank" rel="noopener noreferer">${item.website}</a>
+      </div>
+    </div>
+    <button class="delete">삭제</button>
+  </article>
+  `;
+
+  return template;
+}
+//함수를 실행하면 문자열이 나오게됨
+
+// #렌더
+function renderUserCard(target, data) {
+  insertLast(target, createUserCard(data));
+}
+------------------------------------------------------------------------
+#main.js
+async function renderUserList() {
+  const response = await tiger.get(
+    'https://jsonplaceholder.typicode.com/users'
+  );
+
+  const userData = response.data;
+  // console.log(userData); // 배열
+
+  // userdata 배열의 아이템 뽑아내기
+  userData.forEach((item) => {
+    console.log(item);
+    // html 템플릿 만들기
+    const template = `
+    <article class="user-card" data-index="user-${item.id}">
+      <h3 class="user-name">${item.name}</h3>
+      <div class="user-resouce-info">
+        <div>
+          <a class="user-email" href="mailto:${item.email}">${item.email}</a>
+        </div>
+        <div>
+          <a class="user-website" href="http://${item.website}" target="_blank" rel="noopener noreferer">${item.website}</a>
+        </div>
+      </div>
+      <button class="delete">삭제</button>
+    </article>
+  `;
+
+    insertLast('.user-card-inner', template);
+  });
+}
+
+renderUserList();
+-------------------------------------------------------------------------------
+#위 코드 개량
+import {
+  tiger,
+  insertLast,
+  getNode as $,
+  renderUserCard,
+} from './lib/index.js';
+
+const userCardInner = $('.user-card-inner');
+
+async function renderUserList() {
+  const response = await tiger.get(
+    'https://jsonplaceholder.typicode.com/users'
+  );
+
+  const userData = response.data;
+
+  userData.forEach((item) => {
+    // userCardInner:target
+    renderUserCard(userCardInner, item);
+  });
+
+  // 어디에 랜더링 할껀데? 어떤 데이터를 랜더링 할껀데?
+}
+
+renderUserList();
+-----------------------------------------------------------------------------
+#userlist.js
+import { insertLast } from './insert.js';
+
+// #생성
+
+// ()안에 객체를 전달해야 함.
+
+function createUserCard(data) {
+  const template = `
+  <article class="user-card" data-index="user-${data.id}">
+    <h3 class="user-name">${data.name}</h3>
+    <div class="user-resouce-info">
+      <div>
+        <a class="user-email" href="mailto:${data.email}">${data.email}</a>
+      </div>
+      <div>
+        <a class="user-website" href="http://${data.website}" target="_blank" rel="noopener noreferer">${data.website}</a>
+      </div>
+    </div>
+    <button class="delete">삭제</button>
+  </article>
+  `;
+
+  return template;
+}
+//함수를 실행하면 문자열이 나오게됨
+
+// #렌더
+export function renderUserCard(target, data) {
+  insertLast(target, createUserCard(data));
+}
+------------------------------------------------------------------------------
+## main.js
+async function renderUserList() {
+  const response = await tiger.get(
+    'https://jsonplaceholder.typicode.com/users'
+  );
+
+  const userData = response.data;
+
+  // userData.forEach((item) => {
+  //   // userCardInner:target
+  //   renderUserCard(userCardInner, item);
+  // });
+
+  // 어디에 랜더링 할껀데? 어떤 데이터를 랜더링 할껀데?
+}
+------------------------------------------------------------
+#trycatch
+const userCardInner = $('.user-card-inner');
+
+async function renderUserList() {
+  try {
+    await delayP(); //1초 기다린 후 렌더링 되도록
+    const response = await tiger.get(
+      'https://jsonplaceholder.typicode.com/users'
+    );
+
+    const userData = response.data;
+
+    // 화살표 함수로 생략하여 한줄로 만들기
+    userData.forEach((item) => renderUserCard(userCardInner, item));
+    changeColor('.user-card');
+
+    gsap.to('.user-card', {
+      x: 0, // tramslate X를 원래 위치로
+      opacity: 1, // 투명도 1로
+      stagger: 0.2, //순차적으로 나오게
+    });
+  } catch (error) {
+    console.log(err);
+  }
+
+  // 어디에 랜더링 할껀데? 어떤 데이터를 랜더링 할껀데?
+}
+
+renderUserList();
+-------------------------------------------------------------------------
+
+
+// 버튼을 클릭 했을 때 해당 article의 id값을 가져옴.
+// - 이벤트 위임
+// - button 선택하기 -> 클릭한 대상의 가장 가까운 ... method
+// - attr(), dataset으로 값 가져오기
+
+// 1-1. 이벤트 위임
+
+function handleDelete(e) {
+  const button = e.target.closest('button');
+
+  // article 가져오기
+  const article = e.target.closest('article');
+
+  // 아티클이 아닌 정확히 버튼을 클릭했을 때 삭제될 수 있도록 조건처리
+  if (!article || !button) return; // article, button이 아니라면 함수 실행 중지
+  // console.log(article);
+
+  // dataset 이용
+  console.log(article.dataset.index);
+  // attr() 이용
+  console.log(attr(article, 'data-index')); // index-1 형태로 출력됨
+  console.log(attr(article, 'data-index')).slice(5); // 숫자만 출력
+}
+userCardInner.addEventListener('click', handleDelete);
+----------------------------------------------------------------------function handleDelete(e) {
+  const button = e.target.closest('button');
+
+  // article 가져오기
+  const article = e.target.closest('article');
+
+  // 아티클이 아닌 정확히 버튼을 클릭했을 때 삭제될 수 있도록 조건처리
+  if (!article || !button) return; // article, button이 아니라면 함수 실행 중지
+
+  // dataset 이용
+  // console.log(article.dataset.index);
+  // attr() 이용
+  const id = attr(article, 'data-index').slice(5); // 숫자만 출력
+
+  // fetch로 이루어져있는 tiger유틸함수로 delete통신을 통해 유저 목록 중에 ${id} 제거해줘! 요청
+  tiger.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
+}
+userCardInner.addEventListener('click', handleDelete);
+---------------------------------------------------------------
