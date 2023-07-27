@@ -1,0 +1,95 @@
+import { typeError } from '../error';
+import { isString } from './typeOf';
+
+const { localStorage: storage } = globalThis;
+
+function setStorage(key, value) {
+
+  return new Promise((reslove,reject)=>{
+    if(isString(key)){
+      reslove()
+      storage.setItem(key, JSON.stringify(value))
+    }else{
+      reject({message:'key는 문자 타입이어야 합니다.'})
+    }
+  })
+  // if (!isString(key)) {
+  //   typeError('key는 문자가 아닙니다.');
+  // }
+
+  // storage.setItem(key, JSON.stringify(value));
+}
+
+localStorage.setItem('name', JSON.stringify({ name: 'tiger' }));
+
+setStorage('user', { name: 'tiger' });
+------------------------------------------------------------------
+
+import { typeError } from '../error';
+import { isString } from './typeOf';
+
+const { localStorage: storage } = globalThis;
+
+function setStorage(key, value) {
+  return new Promise((reslove, reject) => {
+    if (isString(key)) {
+      reslove();
+      storage.setItem(key, JSON.stringify(value));
+    } else {
+      reject({ message: 'key는 문자 타입이어야 합니다.' });
+    }
+  });
+}
+
+setStorage('user', { name: 'tiger' });
+
+async function getStorage(key) {
+  return new Promise((resolve, reject) => {
+    if (isString(key)) {
+      resolve(JSON.parse(storage.getItem(key)));
+    } else {
+      reject({ message: 'key는 문자 타입이어야 합니다.' });
+    }
+  });
+}
+
+// getStorage('user'); //-객체가 반환되게
+
+console.log(await getStorage('user'));
+
+localStorage.setItem('name', JSON.stringify({ name: 'tiger' }));
+
+
+
+
+export function deleteStorage(key){
+  return new Promise((resolve, reject) => {
+// 키가 있으면 해당 항목만 삭제, 키가 없다면 전부 삭제
+    !key ? storage.clear() : storage.removeItem(key);
+    resolve();
+  })
+}
+
+
+---------------------------------------------------------------
+import { getNode, getStorage, setStorage } from './lib/index.js';
+
+const textField = getNode('#textField');
+
+function handleTextField() {
+  // value가 계속 값을 입력하고
+  const value = this.value;
+  // setStorage 가 그 값을 계속 저장함.
+  setStorage('text', value);
+  console.log(value);
+}
+
+// 초기 세팅 영역
+function init() {
+  getStorage('text') // promise
+    .then((res) => {
+      console.log(res);
+    });
+}
+textField.addEventListener('input', handleTextField);
+window.addEventListener('DOMContentLoaded', init);
